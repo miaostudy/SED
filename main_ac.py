@@ -58,7 +58,6 @@ def warmup(net, scs, scr, net_ema, ema, optimizer, trainloader, train_loss_meter
         # prob = outputs['prob']
         loss_ce = F.cross_entropy(logits, y, label_smoothing=0.3)
         penalty = conf_penalty(logits)
-        # prob_reg = 1e-5 * torch.norm(prob)
         loss = loss_ce + penalty
 
         accelerator.backward(loss)
@@ -174,7 +173,7 @@ def robust_train(net, scs, scr, n_samples, net_ema, ema, optimizer, trainloader,
 class ResNet(nn.Module):
     def __init__(self, arch='resnet18', num_classes=200, pretrained=True, activation='tanh', classifier='linear'):
         super().__init__()
-        import torchvision  # 在类内部导入以避免可能的循环导入问题
+        import torchvision
         assert arch in torchvision.models.__dict__.keys(), f'{arch} is not supported!'
         resnet = torchvision.models.__dict__[arch](pretrained=pretrained)
         self.backbone = nn.Sequential(
@@ -291,6 +290,7 @@ def parse_args():
     parser.add_argument('--momentum_scr', type=float, default=0.99)
 
     args = parser.parse_args()
+
     if Accelerator().is_main_process:
         print(args)
     return args
@@ -320,8 +320,15 @@ if __name__ == '__main__':
     if config.resume is not None:
         if accelerator.is_main_process:
             dict_s = torch.load(config.resume, map_location='cpu')
-            model.load_state_dict(dict_s)
+            new_state_dict = {}
+            for k, v in dict_s.items():
+                if k.startswith('module.'):
+                    new_k = k[7:]
+                    new_state_dict[new_k] = v
+                else:
+                    new_state_dict[k] = v
 
+            model.load_state_dict(new_state_dict)
         model = accelerator.prepare(model)
         accelerator.wait_for_everyone()
     else:
@@ -362,6 +369,7 @@ if __name__ == '__main__':
             robust_train(model, scs, scr, n_samples, model_ema, ema, optim, trainloader,
                          train_loss_meter, train_accuracy_meter, n_classes, config, accelerator)
 
+        # 评估
         eval_result = evaluate_cls_acc(test_loader, model, accelerator)
         test_accuracy = eval_result['accuracy']
 

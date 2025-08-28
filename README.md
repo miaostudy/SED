@@ -50,11 +50,11 @@ CUDA_VISIBLE_DEVICES=0 python main_web.py --warmup-epoch 10 --epoch 110 --batch-
 
 If you want to train on mutil gpu, use command as follows
 ```python
-accelerate launch main_ac.py --warmup-epoch 10 --epoch 110 --batch-size 128 --lr 0.005 --warmup-lr 0.005  --lr-decay cosine:10,5e-4,110 --weight-decay 5e-4 --seed 123 --opt sgd --dataset web-nat --save-weights True
+accelerate launch main_ac.py --warmup-epoch 10 --epoch 110 --batch-size 32 --lr 0.005 --warmup-lr 0.005  --lr-decay cosine:10,5e-4,110 --weight-decay 5e-4 --seed 123 --opt sgd --dataset web-nat --save-weights True
 ```
 
 ```python
-accelerate launch main_ac.py --warmup-epoch 10 --epoch 110 --batch-size 128 --lr 0.005 --warmup-lr 0.005  --lr-decay cosine:10,5e-4,110 --weight-decay 5e-4 --seed 123 --opt sgd --dataset web-fg --save-weights True
+accelerate launch main_ac.py --warmup-epoch 10 --epoch 110 --batch-size 32 --lr 0.005 --warmup-lr 0.005  --lr-decay cosine:10,5e-4,110 --weight-decay 5e-4 --seed 123 --opt sgd --dataset web-fg --save-weights True
 ```
 
 # Results on Cifar100N and Cifar80N:
