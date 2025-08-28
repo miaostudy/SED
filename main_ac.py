@@ -240,7 +240,7 @@ def build_loader(params):
         class_ = {"web-aircraft": 100, "web-bird": 200, "web-car": 196, "web-fg": 400, "web-nat": 5000}
         num_classes = class_[dataset_n]
         transform = build_transform(rescale_size=448, crop_size=448)
-        root = os.path.join('/root/autodl-tmp', dataset_n)
+        root = os.path.join('/data2/wlf/datasets/', dataset_n)
         dataset = build_webfg_dataset(root,
                                       CLDataTransform(transform['train'], transform["train_strong_aug"]),
                                       transform['test'])
